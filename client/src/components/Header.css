@@ -1,0 +1,16 @@
+.header{
+    display: flex;
+}
+
+.headerButton{
+    margin: 15px;
+    margin-right: 0;
+    background-color: gainsboro;
+    border-style: solid;
+    border-color: black;
+    width: 150px;
+}
+
+.headerButton.active{
+    background-color: orange;
+}

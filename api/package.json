@@ -1,0 +1,25 @@
+{
+  "name": "u2-teste-integracao-sistema",
+  "version": "1.0.0",
+  "description": "",
+  "main": "user-repository.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "test": "jest --detectOpenHandles --watchAll --silent=false"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "jest": "^29.3.1",
+    "supertest": "^6.3.3"
+  },
+  "dependencies": {
+    "@types/jest": "^29.2.4",
+    "@types/mongodb": "^4.0.7",
+    "body-parser": "^1.20.1",
+    "dotenv": "^16.0.3",
+    "express": "^4.18.2",
+    "leaked-handles": "^5.2.0",
+    "mongodb": "^4.12.1"
+  }
+}
