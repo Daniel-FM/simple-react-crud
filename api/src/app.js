@@ -12,6 +12,7 @@ const HTTP_OK_CREATED = 201;
 const HTTP_NOT_FOUND = 404;
 const HTTP_CONFLICT = 409;
 
+//Para poder pegar variáveis do arquivo .env
 require('dotenv').config();
 
 // Este middleware faz com que as requisições que passem pelo servidor que sejam strings no formato json

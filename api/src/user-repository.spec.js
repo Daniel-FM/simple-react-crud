@@ -11,7 +11,7 @@ describe('UserRepository',()=>{
 
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
-        //Por exemplo, a abertura de um banco de dados, que será usado nos testes
+        //Abre o banco de dados, que será usado nos testes
         const user = process.env.TST_DB_USER;
         const pass = process.env.TST_DB_PASS;
         const serverName = process.env.TST_DB_SERVERNAME;
@@ -27,13 +27,13 @@ describe('UserRepository',()=>{
 
     //Executa uma vez antes de cada teste
     beforeEach(async ()=>{
-        //Por exemplo, limpar o banco de dados antes de cada teste, pra impedir que um teste cause efeitos colaterais em outro
+        //Limpa o banco de dados antes de cada teste, pra impedir que um teste cause efeitos colaterais em outro
         await collection.deleteMany({})
     })
 
     //Executa uma vez após todos os testes serem concluídos
     afterAll(async ()=>{
-        //Por exemplo, o fechamento do banco de dados
+        //Fecha o banco de dados
         await client.close()
     })
 
