@@ -1,1 +1,1 @@
-Aplicação CRUD simples para praticar com React, e outros frameworks.1
+Aplicação CRUD simples para praticar com React, e outros frameworks.
