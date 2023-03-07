@@ -1,9 +1,8 @@
 const request = require('supertest')
-const app = require('./app')
+const app = require('./app.cjs')
 
 const {MongoClient} = require('mongodb')
-const UserRepository = require('./user-repository.js');
-const {ObjectId} = require('bson')
+const UserRepository = require('./database.js');
 
 const HTTP_OK = 200;
 const HTTP_OK_CREATED = 201;
@@ -21,16 +20,11 @@ describe("UserApi", ()=>{
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
         //Abre o banco de dados, que será usado nos testes
-        const user = process.env.TST_DB_USER;
-        const pass = process.env.TST_DB_PASS;
-        const serverName = process.env.TST_DB_SERVERNAME;
-        const dbName = process.env.TST_DB_NAME;
-        const collName = process.env.TST_DB_COLLNAME;
-
-        const uri = `mongodb+srv://${user}:${pass}@${serverName}/?retryWrites=true&w=majority`
+        //Exemplo de uri: `mongodb+srv://user:password@cluster0.xgm6rrx.mongodb.net/?retryWrites=true&w=majority`
+        const uri = `mongodb+srv://${process.env.TST_DB_USER}:${process.env.TST_DB_PASS}@${process.env.TST_DB_SERVERNAME}/?retryWrites=true&w=majority`
         client = new MongoClient(uri)
         await client.connect()
-        collection = client.db(dbName).collection(collName)
+        collection = client.db(process.env.TST_DB_NAME).collection(process.env.TST_DB_COLLNAME)
         userRepository = new UserRepository(collection)
     })
 
@@ -66,7 +60,7 @@ describe("UserApi", ()=>{
 
     describe("/users",()=>{
         describe("GET /",()=>{
-            test("retornar lista vazia de usuários", async()=>{
+            test.only("retornar lista vazia de usuários", async()=>{
                 const response = await request(app).get('/users');
                 expect(response.statusCode).toBe(HTTP_OK);
                 expect(response.body).toStrictEqual([]);

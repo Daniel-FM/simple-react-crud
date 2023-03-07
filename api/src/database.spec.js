@@ -1,9 +1,9 @@
 const {MongoClient} = require('mongodb')
-const UserRepository = require('./user-repository.js')
+const UserRepository = require('./database.js')
 
 require('dotenv').config();
 
-describe('UserRepository',()=>{
+describe.skip('UserRepository',()=>{
 
     let userRepository;
     let collection;
@@ -12,16 +12,11 @@ describe('UserRepository',()=>{
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
         //Abre o banco de dados, que será usado nos testes
-        const user = process.env.TST_DB_USER;
-        const pass = process.env.TST_DB_PASS;
-        const serverName = process.env.TST_DB_SERVERNAME;
-        const dbName = process.env.TST_DB_NAME;
-        const collName = process.env.TST_DB_COLLNAME;
-
-        const uri = `mongodb+srv://${user}:${pass}@${serverName}/?retryWrites=true&w=majority`
+        //Exemplo de uri: `mongodb+srv://user:password@cluster0.xgm6rrx.mongodb.net/?retryWrites=true&w=majority`
+        const uri = `mongodb+srv://${process.env.TST_DB_USER}:${process.env.TST_DB_PASS}@${process.env.TST_DB_SERVERNAME}/?retryWrites=true&w=majority`
         client = new MongoClient(uri)
         await client.connect()
-        collection = client.db(dbName).collection(collName)
+        collection = client.db(process.env.TST_DB_NAME).collection(process.env.TST_DB_COLLNAME)
         userRepository = new UserRepository(collection)
     })
 

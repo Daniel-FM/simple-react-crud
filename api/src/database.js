@@ -1,6 +1,25 @@
-class UserRepository{
-    constructor(collection){
-        this.collection = collection
+
+export default class database{
+
+    constructor(){}
+
+    async connect(){
+        //Exemplo de uri: `mongodb+srv://user:password@cluster0.xgm6rrx.mongodb.net/?retryWrites=true&w=majority`
+        const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@${process.env.DB_SERVERNAME}/?retryWrites=true&w=majority`
+        this.client = new MongoClient(uri);
+        await this.client.connect();
+        this.collection = this.client.db(process.env.DB_NAME).collection(process.env.DB_COLLNAME);
+    }
+
+    async close(){
+        await client.close();
+    }
+
+    async isConnected(){
+        if (client === undefined || this.collection === undefined){
+            return false;
+        }
+        return client.isConnected();
     }
 
     async findOneById(_id){
@@ -34,7 +53,7 @@ class UserRepository{
         return newUser;
     }
 
-    async delete(_id){
+    async deleteOne(_id){
         const result = await this.collection.deleteOne({_id});
         if (result.deletedCount == 0){
             throw new Error(`User not found!`);
@@ -86,5 +105,3 @@ class UserRepository{
         return list;
     }
 }
-
-module.exports = UserRepository
