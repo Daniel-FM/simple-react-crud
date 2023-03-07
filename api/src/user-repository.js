@@ -1,6 +1,21 @@
+const {MongoClient} = require('mongodb')
+
 class UserRepository{
-    constructor(collection){
-        this.collection = collection
+    constructor(){
+
+    }
+
+    async connect(){
+        const user = process.env.DB_USER;
+        const pass = process.env.DB_PASS;
+        const serverName = process.env.DB_SERVERNAME;
+        const dbName = process.env.DB_NAME;
+        const collName = process.env.DB_COLLNAME;
+    
+        const uri = `mongodb+srv://${user}:${pass}@${serverName}/?retryWrites=true&w=majority`;
+        this.client = new MongoClient(uri);
+        await this.client.connect();
+        this.collection = this.client.db(dbName).collection(collName);
     }
 
     async findOneById(_id){
