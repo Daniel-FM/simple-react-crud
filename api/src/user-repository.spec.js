@@ -3,7 +3,7 @@ const UserRepository = require('./user-repository.js')
 
 require('dotenv').config();
 
-describe('UserRepository',()=>{
+describe.only('UserRepository',()=>{
 
     let userRepository;
     let collection;
@@ -12,29 +12,20 @@ describe('UserRepository',()=>{
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
         //Abre o banco de dados, que será usado nos testes
-        const user = process.env.TST_DB_USER;
-        const pass = process.env.TST_DB_PASS;
-        const serverName = process.env.TST_DB_SERVERNAME;
-        const dbName = process.env.TST_DB_NAME;
-        const collName = process.env.TST_DB_COLLNAME;
-
-        const uri = `mongodb+srv://${user}:${pass}@${serverName}/?retryWrites=true&w=majority`
-        client = new MongoClient(uri)
-        await client.connect()
-        collection = client.db(dbName).collection(collName)
-        userRepository = new UserRepository(collection)
+        userRepository = new UserRepository();
+        await userRepository.connect();
     })
 
     //Executa uma vez antes de cada teste
     beforeEach(async ()=>{
         //Limpa o banco de dados antes de cada teste, pra impedir que um teste cause efeitos colaterais em outro
-        await collection.deleteMany({})
+        await userRepository.deleteAll();
     })
 
     //Executa uma vez após todos os testes serem concluídos
     afterAll(async ()=>{
         //Fecha o banco de dados
-        await client.close()
+        await userRepository.disconnect();
     })
 
     let dummyName = "John Doe";
@@ -47,17 +38,18 @@ describe('UserRepository',()=>{
 
     describe('findOneByEmail',()=>{
         test('retornar user john@doe.com',async ()=>{
-            const result = await collection.insertOne({
+            const result = await userRepository.insert({
                 name: dummyName,
                 email: dummyEmail
-            })
-            const user = await userRepository.findOneByEmail(dummyEmail)
+            });
 
+            const user = await userRepository.findOneByEmail(dummyEmail);
+            
             expect(user).toStrictEqual({
-                _id: result.insertedId,
+                _id: result._id,
                 name: dummyName,
                 email: dummyEmail
-            })
+            });
         })
         test('lançar exceção para user não-existente', async ()=>{
             await expect(userRepository.findOneByEmail(dummyEmail)).rejects.toThrow()

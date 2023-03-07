@@ -18,6 +18,10 @@ class UserRepository{
         this.collection = this.client.db(dbName).collection(collName);
     }
 
+    async disconnect(){
+        await this.client.close();
+    }
+
     async findOneById(_id){
         const user = await this.collection.findOne({_id});
 
