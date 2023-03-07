@@ -5,17 +5,10 @@ class UserRepository{
 
     }
 
-    async connect(){
-        const user = process.env.DB_USER;
-        const pass = process.env.DB_PASS;
-        const serverName = process.env.DB_SERVERNAME;
-        const dbName = process.env.DB_NAME;
-        const collName = process.env.DB_COLLNAME;
-    
-        const uri = `mongodb+srv://${user}:${pass}@${serverName}/?retryWrites=true&w=majority`;
-        this.client = new MongoClient(uri);
+    async connect(connectionParams){
+        this.client = new MongoClient(connectionParams.url);
         await this.client.connect();
-        this.collection = this.client.db(dbName).collection(collName);
+        this.collection = this.client.db(connectionParams.dbName).collection("users");
     }
 
     async disconnect(){

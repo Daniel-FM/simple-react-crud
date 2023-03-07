@@ -3,6 +3,10 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const {ObjectId} = require('bson')
 
+// Um módulo contendo os métodos de bancos de dados é passado como argumento para que o objeto app possa se abstrair
+// de especificidades do banco de dados usado (por exemplo, o arquivo user-repository.js deste projeto utiliza o banco
+// MongoDB, mas poderia ser um que usa MySQL. Se o módulo conter métodos com os mesmos nomes, que geram os mesmos
+// resultados, ele poderá ser passado aqui sem que a aplicação do servidor note qualquer distinção)
 function getApp(userRepository){
     const app = express()
 
@@ -25,7 +29,13 @@ function getApp(userRepository){
     // não já tiver sido feita) antes de tratar uma requisição
     app.use(async (req,res,next)=>{
         if (!connected){
-            await userRepository.connect();
+            // Conecta usando parâmetos pegos do arquivo .env do projeto
+            const connectionParams = {
+                url: process.env.DB_URL,
+                dbName: process.env.DB_NAME
+            }
+
+            await userRepository.connect(connectionParams);
             connected = true;
         }
 

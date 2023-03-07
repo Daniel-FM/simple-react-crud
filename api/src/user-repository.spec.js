@@ -11,9 +11,15 @@ describe.only('UserRepository',()=>{
 
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
-        //Abre o banco de dados, que será usado nos testes
+        //Conecta no banco de dados que será usado nos testes, passando os parâmetros pegos do arquivo .env do projeto
         userRepository = new UserRepository();
-        await userRepository.connect();
+
+        const connectionParams = {
+            url: process.env.TST_DB_URL,
+            dbName: process.env.TST_DB_NAME
+        }
+
+        await userRepository.connect(connectionParams);
     })
 
     //Executa uma vez antes de cada teste
