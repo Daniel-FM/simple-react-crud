@@ -35,7 +35,7 @@ class UserRepository{
         return user;
     }
 
-    async insert(newUser){
+    async insertOne(newUser){
         const dummyUser = await this.collection.findOne({"email" : newUser.email});
 
         if (dummyUser !== null){
@@ -46,7 +46,7 @@ class UserRepository{
         return newUser;
     }
 
-    async delete(_id){
+    async deleteOne(_id){
         const result = await this.collection.deleteOne({_id});
         if (result.deletedCount == 0){
             throw new Error(`User not found!`);
@@ -57,7 +57,7 @@ class UserRepository{
         await this.collection.deleteMany({});
     }
 
-    async update(id, newUserInfo){
+    async updateOne(id, newUserInfo){
 
         let changedName = false, changedEmail = false;
 

@@ -1,13 +1,10 @@
-const {MongoClient} = require('mongodb')
 const UserRepository = require('./user-repository.js')
 
 require('dotenv').config();
 
-describe.only('UserRepository',()=>{
+describe('UserRepository',()=>{
 
     let userRepository;
-    let collection;
-    let client;
 
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
@@ -34,20 +31,25 @@ describe.only('UserRepository',()=>{
         await userRepository.disconnect();
     })
 
-    let dummyName = "John Doe";
-    let dummyEmail = "john@doe.com";
+    const dummyName = "John Doe";
+    const dummyEmail = "john@doe.com";
+    const dummyUser = {
+        name: dummyName,
+        email: dummyEmail
+    }
 
-    let dummyName2 = "Bob Doe";
-    let dummyEmail2 = "bob@doe.com";
+    const dummyName2 = "Bob Doe";
+    const dummyEmail2 = "bob@doe.com";
+    const dummyUser2 = {
+        name: dummyName2,
+        email: dummyEmail2
+    }
 
     const dummyId = "12345";
 
     describe('findOneByEmail',()=>{
         test('retornar user john@doe.com',async ()=>{
-            const result = await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            });
+            const result = await userRepository.insertOne(dummyUser);
 
             const user = await userRepository.findOneByEmail(dummyEmail);
             
@@ -62,101 +64,92 @@ describe.only('UserRepository',()=>{
         })
     })
     describe('insert',()=>{
-        test('inserir novo user', async()=>{
-            const user = await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            })
+        test('adicionar novo user', async()=>{
+            const user = await userRepository.insertOne(dummyUser)
 
             const result = await userRepository.findOneByEmail(dummyEmail);
 
             expect(result).toStrictEqual(user);
         })
+
+        test('não permitir a adição de usuários com e-mail duplicado', async()=>{
+            const user = await userRepository.insertOne(dummyUser)
+
+            expect(user).toEqual(expect.objectContaining(dummyUser));
+
+            const duplicateEmailUser = {
+                name: dummyName2,
+                email: dummyEmail
+            };
+
+            expect(userRepository.insertOne(duplicateEmailUser)).rejects.toThrow();
+
+        })
     })
 
     describe('update',()=>{
         test('atualizar user (2 campos)', async()=>{
-            let user = await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            })
+            let user = await userRepository.insertOne(dummyUser)
 
-            let user2 = {
-                _id: user._id,
-                name: dummyName2,
-                email: dummyEmail2
-            }
+            const insertedUserId = user._id;
 
-            const result = await userRepository.update(user._id, user2);
+            await userRepository.updateOne(insertedUserId, dummyUser2);
             user = await userRepository.findOneByEmail(dummyEmail2);
 
-            expect(user).toStrictEqual(user2);
+            expect(user).toStrictEqual({
+                _id: insertedUserId,
+                name: dummyName2,
+                email: dummyEmail2
+            });
 
         })
 
         test('atualizar user (1 campo)', async()=>{
-            let user = await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            })
+            let user = await userRepository.insertOne(dummyUser)
 
             let newInfo = {
                 email: dummyEmail2
             }
 
-            const result = await userRepository.update(user._id, newInfo);
+            await userRepository.updateOne(user._id, newInfo);
             user = await userRepository.findOneById(user._id);
 
             expect(user.name).toBe(dummyName);
         })
         
         test('lançar exceção para user não-existente', async()=>{
-
-            let user = {
+            let dummyInfo = {
                 name: dummyName,
-                email: dummyEmail
-            }
+            };
 
-            await expect(userRepository.update(dummyId, user)).rejects.toThrow();
+            await expect(userRepository.updateOne(dummyId, dummyInfo)).rejects.toThrow();
         })
     })
 
     describe('delete',()=>{
         test('remover user', async()=>{
-            const user = await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            })
+            const user = await userRepository.insertOne(dummyUser);
 
-            await userRepository.delete(user._id);
+            await userRepository.deleteOne(user._id);
 
             await expect(userRepository.findOneByEmail(dummyEmail)).rejects.toThrow()
         })
 
         test('lançar exceção para user não-existente', async()=>{
-            await expect(userRepository.delete(dummyId)).rejects.toThrow()
+            await expect(userRepository.deleteOne(dummyId)).rejects.toThrow()
         })
     })
     describe('findall',()=>{
         test('retornar lista vazia',async()=>{
             const list = await userRepository.findAll();
-
             expect(list).toStrictEqual([]);
         })
 
         test('retornar lista com 2 users', async()=>{
-            await userRepository.insert({
-                name: dummyName,
-                email: dummyEmail
-            })
-
-            await userRepository.insert({
-                name: dummyName2,
-                email: dummyEmail2
-            })
+            await userRepository.insertOne(dummyUser)
+            await userRepository.insertOne(dummyUser2)
 
             const list = await userRepository.findAll();
-
             expect(list.length).toBe(2);
         })
     })

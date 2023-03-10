@@ -58,15 +58,6 @@ function getApp(userRepository){
         res.status(HTTP_OK).json(users);
     })
 
-    app.post('/users', async(req,res)=>{
-        try{
-            const user = await userRepository.insert(req.body);
-            res.status(HTTP_OK_CREATED).json(user);
-        }catch(e){
-            res.status(HTTP_CONFLICT).send();
-        }
-    })
-
     app.get('/users/:userid', async(req,res)=>{
         try{
             const user = await userRepository.findOneById(ObjectId(req.params.userid));
@@ -76,9 +67,18 @@ function getApp(userRepository){
         }
     })
 
+    app.post('/users', async(req,res)=>{
+        try{
+            const user = await userRepository.insertOne(req.body);
+            res.status(HTTP_OK_CREATED).json(user);
+        }catch(e){
+            res.status(HTTP_CONFLICT).send();
+        }
+    })
+
     app.delete('/users/:userid', async(req,res)=>{
         try{
-            await userRepository.delete(ObjectId(req.params.userid));
+            await userRepository.deleteOne(ObjectId(req.params.userid));
             res.status(HTTP_OK).send();
         }catch(e){
             res.status(HTTP_NOT_FOUND).send();
@@ -87,7 +87,7 @@ function getApp(userRepository){
 
     app.put('/users/:userid', async(req,res)=>{
         try{
-            await userRepository.update(ObjectId(req.params.userid), req.body);
+            await userRepository.updateOne(ObjectId(req.params.userid), req.body);
             res.status(HTTP_OK).send();
         }catch(e){
             res.status(HTTP_NOT_FOUND).send();
