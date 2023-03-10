@@ -1,14 +1,22 @@
 const {MongoClient} = require('mongodb')
 
-class UserRepository{
-    constructor(){
+const ERROR_MSG_NO_PARAMS = "Não foram passados os parâmetros de conexão ao banco de dados! " + 
+"Verifique se estas informações estão presentes no arquivo .env na raíz do projeto.";
 
+class UserRepository{
+    constructor(connectionParams){
+        this.url = connectionParams.url;
+        this.dbName = connectionParams.dbName;
+
+        if (this.url === undefined || this.dbName === undefined){
+            throw new Error(ERROR_MSG_NO_PARAMS);
+        }
     }
 
-    async connect(connectionParams){
-        this.client = new MongoClient(connectionParams.url);
+    async connect(){
+        this.client = new MongoClient(this.url);
         await this.client.connect();
-        this.collection = this.client.db(connectionParams.dbName).collection("users");
+        this.collection = this.client.db(this.dbName).collection("users");
     }
 
     async disconnect(){

@@ -8,15 +8,15 @@ describe('UserRepository',()=>{
 
     //Executa uma vez, antes da execução dos testes
     beforeAll(async ()=>{
-        //Conecta no banco de dados que será usado nos testes, passando os parâmetros pegos do arquivo .env do projeto
-        userRepository = new UserRepository();
-
+        // Conecta no banco de dados que será usado nos testes, usando os parâmetros 
+        // pegos do arquivo .env do projeto que são passados no construtor da classe
         const connectionParams = {
             url: process.env.TST_DB_URL,
             dbName: process.env.TST_DB_NAME
         }
 
-        await userRepository.connect(connectionParams);
+        userRepository = new UserRepository(connectionParams);
+        await userRepository.connect();
     })
 
     //Executa uma vez antes de cada teste

@@ -1,5 +1,5 @@
 const express = require('express')
-
+const userRepository = require('./user-repository')
 const bodyParser = require('body-parser')
 const {ObjectId} = require('bson')
 
@@ -15,9 +15,6 @@ function getApp(userRepository){
     const HTTP_NOT_FOUND = 404;
     const HTTP_CONFLICT = 409;
 
-    //Para poder pegar variáveis do arquivo .env
-    require('dotenv').config();
-
     // Este middleware faz com que as requisições que passem pelo servidor que sejam strings no formato json
     // sejam transformadas em actual objetos json. Dessa forma, quando pegarmos o campo body de uma response,
     // ele já vai vir como um objeto do qual podemos facilmente pegar seus campos, ao invés de um texto
@@ -29,13 +26,7 @@ function getApp(userRepository){
     // não já tiver sido feita) antes de tratar uma requisição
     app.use(async (req,res,next)=>{
         if (!connected){
-            // Conecta usando parâmetos pegos do arquivo .env do projeto
-            const connectionParams = {
-                url: process.env.DB_URL,
-                dbName: process.env.DB_NAME
-            }
-
-            await userRepository.connect(connectionParams);
+            await userRepository.connect();
             connected = true;
         }
 
